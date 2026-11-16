@@ -1,0 +1,13 @@
+# Keep the AOKZOE A1X integrated gamepad (xpad 045e:028e, serial 0123456789)
+# hidden from users from the moment its device nodes are created.
+#
+# InputPlumber hides it too, but only after the node appears and with rules
+# tied to the (changing) input number, so Steam can open the raw pad in the gap
+# after a USB re-enumeration (eGPU dock, resume) or an InputPlumber restart.
+# That shows up in Steam as a duplicate "Xbox 360 Controller".
+#
+# Ordered after 70-uaccess.rules and the 71-*-gdu.rules game-devices files
+# (71-microsoft-gdu.rules tags 045e:028e with uaccess) and before
+# 73-seat-late.rules (which turns that tag into a user ACL). InputPlumber runs
+# as root and still reads the device.
+ACTION=="add|change", SUBSYSTEM=="input", KERNEL=="js[0-9]*|event[0-9]*", ATTRS{idVendor}=="045e", ATTRS{idProduct}=="028e", ATTRS{serial}=="0123456789", MODE:="0000", GROUP:="root", TAG-="uaccess"

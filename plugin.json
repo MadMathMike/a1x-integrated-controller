@@ -1,0 +1,11 @@
+{
+  "name": "A1X Controller",
+  "author": "Michael Peterson",
+  "flags": ["root"],
+  "api_version": 1,
+  "publish": {
+    "tags": ["controller", "inputplumber", "aokzoe"],
+    "description": "Disable/enable and restart the AOKZOE A1X integrated controller via InputPlumber.",
+    "image": ""
+  }
+}
