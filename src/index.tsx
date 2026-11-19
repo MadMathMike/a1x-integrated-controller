@@ -46,6 +46,15 @@ const enableController = callable<[], Result>("enable_controller");
 const restartInputPlumber = callable<[], Result>("restart_inputplumber");
 const resetPad = callable<[], Result>("reset_pad");
 
+// Field descriptions are HTML, so "\n" would collapse into a space.
+const Lines = ({ lines }: { lines: string[] }) => (
+  <>
+    {lines.map((line, i) => (
+      <div key={i}>{line}</div>
+    ))}
+  </>
+);
+
 function Content() {
   const [status, setStatus] = useState<Status | null>(null);
   const [busy, setBusy] = useState(false);
@@ -203,9 +212,13 @@ function Content() {
               focusable
               label="Raw pad"
               description={
-                `nodes: ${status.pad_nodes.join(", ") || "-"}\n` +
-                `hide rule: ${status.rule_installed ? "installed" : "missing"}\n` +
-                `open by: ${status.raw_holders.map((h) => `${h.comm}[${h.pid}] ${h.node}`).join(", ") || "nobody"}`
+                <Lines
+                  lines={[
+                    `nodes: ${status.pad_nodes.join(", ") || "-"}`,
+                    `hide rule: ${status.rule_installed ? "installed" : "missing"}`,
+                    `open by: ${status.raw_holders.map((h) => `${h.comm}[${h.pid}] ${h.node}`).join(", ") || "nobody"}`,
+                  ]}
+                />
               }
             />
           </PanelSectionRow>
@@ -215,9 +228,13 @@ function Content() {
                 focusable
                 label={`${c.path.split("/").pop()}: ${c.name}`}
                 description={
-                  `profile: ${c.profile ?? "-"}\n` +
-                  `sources: ${(c.sources ?? []).join(", ") || "-"}\n` +
-                  `targets: ${(c.targets ?? []).map((t) => t.split("/").pop()).join(", ") || "-"}`
+                  <Lines
+                    lines={[
+                      `profile: ${c.profile ?? "-"}`,
+                      `sources: ${(c.sources ?? []).join(", ") || "-"}`,
+                      `targets: ${(c.targets ?? []).map((t) => t.split("/").pop()).join(", ") || "-"}`,
+                    ]}
+                  />
                 }
               />
             </PanelSectionRow>
@@ -226,7 +243,7 @@ function Content() {
             <Field
               focusable
               label={`Gamepads visible to games (${status.gamepads.length})`}
-              description={status.gamepads.map((g) => `${g.node}: ${g.name}`).join("\n") || "none"}
+              description={<Lines lines={status.gamepads.length ? status.gamepads.map((g) => `${g.node}: ${g.name}`) : ["none"]} />}
             />
           </PanelSectionRow>
           {status.last_error && (
