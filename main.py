@@ -43,8 +43,6 @@ RULE_DST = os.path.join("/etc/udev/rules.d", RULE_NAME)
 
 SETTINGS_FILE = os.path.join(decky.DECKY_PLUGIN_SETTINGS_DIR, "settings.json")
 DEFAULT_SETTINGS = {
-    # Name of the composite device treated as "integrated". None = auto-detect.
-    "device_name": None,
     # Last name we saw for it, so we still know what to look for while stopped.
     "last_seen_name": None,
     # Re-enable automatically if no other gamepad is present while disabled.
@@ -247,9 +245,6 @@ class Plugin:
 
     def _pick_name(self, composites):
         names = [c["name"] for c in composites if c.get("name")]
-        wanted = self.settings.get("device_name")
-        if wanted:
-            return wanted
         for n in names:
             if re.search(r"aokzoe|a1\s?x|onexplayer", n, re.I):
                 return n
@@ -306,11 +301,6 @@ class Plugin:
         except Exception as e:
             status["error"] = str(e)
         return status
-
-    async def set_device(self, name):
-        self.settings["device_name"] = name or None
-        self._save_settings()
-        return True
 
     async def set_failsafe(self, enabled):
         self.settings["failsafe"] = bool(enabled)

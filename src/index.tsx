@@ -1,6 +1,5 @@
 import {
   ButtonItem,
-  DropdownItem,
   Field,
   PanelSection,
   PanelSectionRow,
@@ -41,7 +40,6 @@ interface Result {
 }
 
 const getStatus = callable<[], Status>("get_status");
-const setDevice = callable<[name: string], boolean>("set_device");
 const setFailsafe = callable<[enabled: boolean], boolean>("set_failsafe");
 const disableController = callable<[], Result>("disable_controller");
 const enableController = callable<[], Result>("enable_controller");
@@ -110,9 +108,6 @@ function Content() {
     );
   }
 
-  const names = Array.from(
-    new Set([...status.composites.map((c) => c.name), status.selected].filter((n): n is string => !!n))
-  );
   const otherPads = status.gamepads.length;
 
   return (
@@ -187,17 +182,6 @@ function Content() {
 
       <PanelSection title="Settings">
         <PanelSectionRow>
-          <DropdownItem
-            label="Integrated device"
-            rgOptions={names.map((n) => ({ data: n, label: n }))}
-            selectedOption={status.selected}
-            onChange={async (opt) => {
-              await setDevice(opt.data as string);
-              refresh();
-            }}
-          />
-        </PanelSectionRow>
-        <PanelSectionRow>
           <ToggleField label="Show diagnostics" checked={showDiag} onChange={setShowDiag} />
         </PanelSectionRow>
       </PanelSection>
@@ -205,10 +189,18 @@ function Content() {
       {showDiag && (
         <PanelSection title="Diagnostics">
           <PanelSectionRow>
-            <Field label="InputPlumber" description={`v${status.version}`} />
+            <Field
+              focusable
+              label="Target"
+              description={`${status.selected ?? "none found"}${status.disabled ? " (stopped)" : ""}`}
+            />
+          </PanelSectionRow>
+          <PanelSectionRow>
+            <Field focusable label="InputPlumber" description={`v${status.version}`} />
           </PanelSectionRow>
           <PanelSectionRow>
             <Field
+              focusable
               label="Raw pad"
               description={
                 `nodes: ${status.pad_nodes.join(", ") || "-"}\n` +
@@ -220,6 +212,7 @@ function Content() {
           {status.composites.map((c) => (
             <PanelSectionRow key={c.path}>
               <Field
+                focusable
                 label={`${c.path.split("/").pop()}: ${c.name}`}
                 description={
                   `profile: ${c.profile ?? "-"}\n` +
@@ -231,13 +224,14 @@ function Content() {
           ))}
           <PanelSectionRow>
             <Field
+              focusable
               label={`Gamepads visible to games (${status.gamepads.length})`}
               description={status.gamepads.map((g) => `${g.node}: ${g.name}`).join("\n") || "none"}
             />
           </PanelSectionRow>
           {status.last_error && (
             <PanelSectionRow>
-              <Field label="Last error" description={status.last_error} />
+              <Field focusable label="Last error" description={status.last_error} />
             </PanelSectionRow>
           )}
         </PanelSection>

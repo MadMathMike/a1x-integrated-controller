@@ -1,6 +1,6 @@
 {
   "name": "a1x-integrated-controller",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Decky plugin to manage the AOKZOE A1X integrated controller via InputPlumber",
   "type": "module",
   "scripts": {
